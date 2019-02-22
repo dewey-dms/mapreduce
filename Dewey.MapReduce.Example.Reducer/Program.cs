@@ -4,13 +4,14 @@ namespace Dewey.MapReduce.Example.Reducer
 {
     class Program
     {
-             public static void Main(string[] args)
+        public static void Main(string[] args)
         {
             string classification = null;
             var count = 0L;
 
-            //var line = Console.ReadLine();
-            var line = "Pułku Piechoty 67\t1";
+            var line = Console.ReadLine();
+           
+            
             while (line != null)
             {
                 var parts = line.Split('\t');
