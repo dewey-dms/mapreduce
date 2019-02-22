@@ -9,10 +9,12 @@ namespace Dewey.MapReduce.Example.Mapper
     {
         private readonly static int STREET_FIRST = 7;
         private readonly static int STREET_LAST = 8; 
+     
+        
         static void Main(string[] args)
         {
-          
-          
+            int number = 0 ;
+
             string line = Console.ReadLine();
             Configuration configuration = new Configuration();
             configuration.Delimiter = ";";
@@ -25,8 +27,12 @@ namespace Dewey.MapReduce.Example.Mapper
                     string[] fields;
                     try {
                         fields = parser.Read();
-                        Console.WriteLine($"{fields[STREET_FIRST]} {fields[STREET_LAST]}\t1");
-                     } catch(Exception ex){}
+                        if (!int.TryParse(fields[STREET_FIRST],out number))
+                            Console.WriteLine($"{fields[STREET_FIRST]} {fields[STREET_LAST]}\t1");
+                     } catch(Exception ex){
+
+                         Console.Error.WriteLine("reporter:counter:Dewey.MapReduce.Example,Bad input lines,1");
+                     }
                 }
                 line = Console.ReadLine();
            }
