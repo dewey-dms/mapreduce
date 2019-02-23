@@ -7,6 +7,8 @@ namespace Dewey.MapReduce.Example.Mapper
 {
     public class Program
     {
+
+        private readonly static int FEATURE = 6;
         private readonly static int STREET_FIRST = 7;
         private readonly static int STREET_LAST = 8; 
      
@@ -28,7 +30,7 @@ namespace Dewey.MapReduce.Example.Mapper
                     try {
                         fields = parser.Read();
                         if (!int.TryParse(fields[STREET_FIRST],out number))
-                            Console.WriteLine($"{fields[STREET_FIRST]} {fields[STREET_LAST]}\t1");
+                            Console.WriteLine($"{fields[FEATURE]} {fields[STREET_FIRST]} {fields[STREET_LAST]}\t1");
                      } catch(Exception ex){
 
                          Console.Error.WriteLine("reporter:counter:Dewey.MapReduce.Example,Bad input lines,1");

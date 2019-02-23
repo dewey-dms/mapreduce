@@ -1,2 +1,41 @@
+
+-- Hadoop
+
+-- Stworzenie pliku z policzonymi wystapieniami ulicy
 hadoop jar /opt/hadoop-2.7.7/share/hadoop/tools/lib/hadoop-streaming-2.7.7.jar -files "publish_example"  -mapper "dotnet publish_example/Dewey.MapReduce.Example.Mapper.dll" -combiner "dotnet publish_example/Dewey.MapReduce.Example.Combiner.dll" -reducer "dotnet publish_example/Dewey.MapReduce.Example.Reducer.dll" -input /data/input -output /data/output/207
+
+
+-- Posortowanie wyniku malejaco co do wystapien
+-- Zmiana klucza z wartoscia by posortowac potem po kluczu ilosci
+
 hadoop jar /opt/hadoop-2.7.7/share/hadoop/tools/lib/hadoop-streaming-2.7.7.jar -D mapreduce.job.output.key.comparator.class=org.apache.hadoop.mapreduce.lib.partition.KeyFieldBasedComparator -D mapred.text.key.comparator.options=-k1nr -files "publish_example" -mapper "dotnet publish_example/Dewey.MapReduce.Example.Mapper.ReverseKeyAndValue.dll" -reducer org.apache.hadoop.mapred.lib.IdentityReducer -input /data/input2 -output /data/output2/2 
+
+
+
+-- Hive
+
+-- Stworzenie tabeli na podstawie CSV
+create external table if not exists streets_data
+(WOJ string ,POWI string , GMI string , RODZ_GMI string , SYM string , SYM_UL string , CECHA string , 
+NAZWA1 string , NAZWA2 string , STAN_NA string)
+ROW FORMAT DELIMITED
+FIELDS TERMINATED BY ';'
+STORED AS TEXTFILE
+LOCATION '/data/input'
+tblproperties ("skip.header.line.count"="1")
+
+
+-- Zapisanie wyniku
+--- na podstawie policzenia ilosc wystapien danej ulicy
+-- oraz posortowanie wyniku malejaco
+
+
+INSERT OVERWRITE DIRECTORY '/data/output/hive_final' 
+ROW FORMAT DELIMITED 
+FIELDS TERMINATED BY '\t' 
+STORED AS TEXTFILE
+select tmp.cecha||' '|| tmp.nazwa1||' '||tmp.nazwa2 , tmp.ilosc 
+from (
+select cecha, nazwa1, nazwa2 , count(*) as ilosc from streets_data
+group by cecha , nazwa1 , nazwa2 
+) tmp order by tmp.ilosc desc
